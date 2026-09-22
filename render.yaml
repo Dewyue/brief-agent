@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: brief-agent
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: SILICONFLOW_API_KEY
+        sync: false
+      - key: SILICONFLOW_BASE_URL
+        value: https://api.siliconflow.cn/v1
+      - key: SILICONFLOW_MODEL
+        value: deepseek-ai/DeepSeek-V4-Flash
