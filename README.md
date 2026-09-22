@@ -25,20 +25,35 @@ node server.js
 
 浏览器打开 `http://127.0.0.1:8787`。
 
-## 部署到 Railway（给几个人试用）
+## 部署到 Render（免费，电脑不用开着）
 
-1. 把本仓库推到 GitHub（不要提交 `.env`）。
-2. 打开 [Railway Dashboard](https://railway.com/dashboard) → **New Project** → **Deploy from GitHub repo** → 选 `brief-agent`。
-3. 在服务的 **Variables** 里添加：
-   - `SILICONFLOW_API_KEY`（必填）
-   - `SILICONFLOW_BASE_URL`=`https://api.siliconflow.cn/v1`（可选）
-   - `SILICONFLOW_MODEL`=`deepseek-ai/DeepSeek-V4-Flash`（可选；不支持 tools 就换模型）
-4. **Settings → Networking → Generate Domain**，用生成的 `*.up.railway.app` 链接发给朋友。
-5. Start Command 用 `npm start`（Nixpacks 一般会自动识别）。
+Railway 试用到期后可用这条。Render Free **不收托管费**；你的电脑可以关机。
 
-费用：新账号通常有 **Trial $5 / 30 天**；之后 Free 每月约 **$1 额度**。几个人偶尔点一下，一般到不了要付费。Hobby（$5/月）不是必须的。
+代价：闲置约 15 分钟会休眠，别人第一次打开可能要等约 1 分钟醒来。几个人试用完全够用。
 
-注意：`outputs/` 写在容器磁盘上，重新部署后可能清空；演示够用。
+1. 打开 [https://dashboard.render.com](https://dashboard.render.com)，用 **GitHub** 登录。
+2. **New +** → **Web Service** → 选仓库 `Dewyue/brief-agent`（私有库需先授权 Render）。
+3. 填写：
+   - **Runtime**: Node
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Instance Type**: **Free**
+4. **Environment** 里添加：
+   - `SILICONFLOW_API_KEY`（必填，和本地 `.env` 同一个）
+   - 可选：`SILICONFLOW_BASE_URL`=`https://api.siliconflow.cn/v1`
+   - 可选：`SILICONFLOW_MODEL`=`deepseek-ai/DeepSeek-V4-Flash`
+5. **Create Web Service**，等 Deploy 变绿。
+6. 用生成的 `https://xxx.onrender.com` 链接发给朋友。
+
+仓库里已有 `render.yaml`，也可在 Render 里用 **Blueprint** 一键导入。
+
+注意：`outputs/` 在免费实例上不持久，重新部署或休眠醒来后文件可能没了；演示够用。硅基流动 API 费用另算。
+
+## 部署到 Railway（试用额度用完后要付费）
+
+Railway 新账号通常有 Trial；额度用完后创建项目常会要求升 Hobby（约 $5/月）。几个人试用优先用上面的 Render Free。
+
+若仍用 Railway：连 GitHub 仓库 `brief-agent` → Variables 填 `SILICONFLOW_API_KEY` → Generate Domain。
 
 ## 怎样算跑通
 
