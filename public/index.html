@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>需求简报 Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f7f7f5;
+      --bg-elevated: #ffffff;
+      --ink: #1a1d24;
+      --muted: #667085;
+      --muted-2: #98a2b3;
+      --line: #e4e7ec;
+      --line-strong: #d0d5dd;
+      --accent: #0f1115;
+      --accent-ink: #ffffff;
+      --danger: #b42318;
+      --ok: #067647;
+      --ok-bg: #ecfdf3;
+      --ok-line: #abefc6;
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+      --shadow-md: 0 8px 24px rgba(16, 24, 40, 0.06), 0 2px 6px rgba(16, 24, 40, 0.04);
+      --shadow-lg: 0 24px 64px rgba(16, 24, 40, 0.1), 0 8px 20px rgba(16, 24, 40, 0.06);
+      --radius: 16px;
+      --radius-pill: 999px;
+      --font: Inter, "Noto Sans SC", system-ui, -apple-system, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: var(--font);
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, #e8eef8 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, #f0ebe3 0%, transparent 45%),
+        radial-gradient(ellipse 50% 35% at 0% 20%, #e9f0ea 0%, transparent 40%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(920px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.1rem 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--ink);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .top-meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    main {
+      width: min(920px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.2rem 0 5rem;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      margin: 0 auto 0.85rem;
+      max-width: none;
+      font-size: clamp(1.35rem, 2.8vw + 0.6rem, 2.35rem);
+      letter-spacing: -0.035em;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    h1 .em {
+      font-size: 1.22em;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .lede {
+      margin: 0 auto;
+      max-width: 42rem;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.55;
+      font-weight: 400;
+    }
+
+    .lede .em {
+      color: var(--ink);
+      font-size: 1.12em;
+      font-weight: 600;
+    }
+
+    @media (max-width: 560px) {
+      h1 {
+        white-space: normal;
+        font-size: clamp(1.4rem, 6vw, 1.75rem);
+      }
+    }
+
+    .composer {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 4px);
+      box-shadow: var(--shadow-lg);
+      padding: 0.85rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .composer:focus-within {
+      border-color: var(--line-strong);
+      box-shadow: var(--shadow-lg), 0 0 0 4px rgba(15, 17, 21, 0.04);
+    }
+
+    .field-label {
+      display: block;
+      padding: 0.35rem 0.65rem 0.15rem;
+      font-size: 1.05rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 7.5rem;
+      resize: vertical;
+      border: none;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 1.02rem;
+      line-height: 1.55;
+      padding: 0.35rem 0.65rem 0.35rem;
+      outline: none;
+    }
+
+    textarea::placeholder {
+      color: var(--muted-2);
+    }
+
+    .composer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.35rem 0.35rem 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--line);
+      background: #fafafa;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .chip .em {
+      color: var(--ink);
+      font-size: 1.12em;
+      font-weight: 650;
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #12b76a;
+    }
+
+    .icon-btn {
+      width: 2.35rem;
+      height: 2.35rem;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .icon-btn:hover:not(:disabled) {
+      background: #fafafa;
+      border-color: var(--line-strong);
+    }
+
+    .icon-btn.listening {
+      background: #fef3f2;
+      border-color: #fecdca;
+      color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.08);
+    }
+
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid transparent;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 550;
+      padding: 0.55rem 1.05rem;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: background 0.12s ease, opacity 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+    }
+
+    button:active:not(:disabled) { transform: translateY(0.5px); }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .primary:hover:not(:disabled) {
+      background: #262a33;
+    }
+
+    .ghost {
+      background: transparent;
+      border-color: var(--line);
+      color: var(--ink);
+    }
+
+    .ghost:hover:not(:disabled) {
+      background: #fafafa;
+      border-color: var(--line-strong);
+    }
+
+    .danger {
+      background: transparent;
+      border-color: #fecdca;
+      color: var(--danger);
+    }
+
+    .danger:hover:not(:disabled) {
+      background: #fef3f2;
+    }
+
+    .status {
+      margin: 0.9rem 0 0;
+      min-height: 1.35rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    .status.error { color: var(--danger); }
+    .status.ok { color: var(--ok); }
+
+    #results {
+      display: none;
+      margin-top: 1.5rem;
+      animation: rise 0.35s ease;
+    }
+
+    #results.visible { display: block; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .card.span-2 { grid-column: 1 / -1; }
+    }
+
+    .card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.05rem 1.15rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted-2);
+      font-weight: 600;
+    }
+
+    .card p, .card ul {
+      margin: 0;
+      line-height: 1.55;
+      font-size: 0.98rem;
+      color: var(--ink);
+    }
+
+    .card ul {
+      padding-left: 1.1rem;
+    }
+
+    .card li + li { margin-top: 0.3rem; }
+
+    .trace {
+      margin-top: 0.85rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted-2);
+      word-break: break-all;
+      text-align: center;
+    }
+
+    .locked-banner {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.85rem 1.1rem;
+      border: 1px solid var(--ok-line);
+      background: var(--ok-bg);
+      color: var(--ok);
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .locked-banner.visible { display: block; }
+
+    .actions-confirm {
+      display: none;
+      margin-top: 1.1rem;
+      justify-content: center;
+    }
+
+    .actions-confirm.visible { display: flex; }
+
+    .foot {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: var(--muted-2);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">B</span>
+      Brief Agent
+    </a>
+    <span class="top-meta">无需注册 · 密钥在服务器</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>把<span class="em">模糊需求</span>收成可对齐的<span class="em">简报</span></h1>
+      <p class="lede">贴一句想法。Agent 整理成问题、范围、不做清单，以及人在哪一步确认。写文件前会停住等你点头。</p>
+    </section>
+
+    <section class="composer">
+      <label class="field-label" for="need">模糊需求</label>
+      <textarea id="need" maxlength="2000" placeholder="规划、澄清、再决定开不开工……"></textarea>
+      <div class="composer-bar">
+        <span class="chip"><span class="chip-dot" aria-hidden="true"></span>Agent · <span class="em">简报</span></span>
+        <div class="row">
+          <button type="button" class="icon-btn" id="btn-voice" title="语音输入" aria-label="语音输入">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+              <path d="M12 18v3"/>
+            </svg>
+          </button>
+          <button type="button" class="ghost" id="btn-reset" hidden>再写一条</button>
+          <button type="button" class="primary" id="btn-generate">生成</button>
+        </div>
+      </div>
+    </section>
+    <p class="status" id="status" aria-live="polite"></p>
+
+    <section id="results">
+      <div class="grid">
+        <article class="card span-2">
+          <h2>问题</h2>
+          <p id="out-problem">—</p>
+        </article>
+        <article class="card">
+          <h2>范围</h2>
+          <p id="out-scope">—</p>
+        </article>
+        <article class="card">
+          <h2>人在哪一步确认</h2>
+          <p id="out-confirm">—</p>
+        </article>
+        <article class="card span-2">
+          <h2>不做清单</h2>
+          <ul id="out-oos"></ul>
+        </article>
+      </div>
+      <p class="trace" id="trace"></p>
+      <div class="row actions-confirm" id="confirm-row">
+        <button type="button" class="primary" id="btn-lock">确认锁定</button>
+        <button type="button" class="danger" id="btn-abandon">放弃</button>
+      </div>
+      <div class="locked-banner" id="locked-banner"></div>
+    </section>
+
+    <p class="foot">确认锁定才会写入 outputs · 刷新即清空草稿</p>
+  </main>
+
+  <script>
+    const els = {
+      need: document.getElementById("need"),
+      generate: document.getElementById("btn-generate"),
+      reset: document.getElementById("btn-reset"),
+      voice: document.getElementById("btn-voice"),
+      status: document.getElementById("status"),
+      results: document.getElementById("results"),
+      problem: document.getElementById("out-problem"),
+      scope: document.getElementById("out-scope"),
+      oos: document.getElementById("out-oos"),
+      confirm: document.getElementById("out-confirm"),
+      trace: document.getElementById("trace"),
+      confirmRow: document.getElementById("confirm-row"),
+      lock: document.getElementById("btn-lock"),
+      abandon: document.getElementById("btn-abandon"),
+      lockedBanner: document.getElementById("locked-banner"),
+    };
+
+    let session = null;
+    let recognition = null;
+    let listening = false;
+    let voiceBase = "";
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      els.voice.hidden = true;
+    } else {
+      recognition = new SpeechRecognition();
+      recognition.lang = "zh-CN";
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        listening = true;
+        els.voice.classList.add("listening");
+        els.voice.setAttribute("aria-pressed", "true");
+        setStatus("正在听…再说一遍模糊需求");
+      };
+
+      recognition.onend = () => {
+        listening = false;
+        els.voice.classList.remove("listening");
+        els.voice.setAttribute("aria-pressed", "false");
+        if (els.status.textContent.startsWith("正在听")) {
+          setStatus(els.need.value.trim() ? "语音已写入，可继续编辑或生成。" : "");
+        }
+      };
+
+      recognition.onerror = (event) => {
+        listening = false;
+        els.voice.classList.remove("listening");
+        els.voice.setAttribute("aria-pressed", "false");
+        const err = event.error;
+        if (err === "not-allowed" || err === "service-not-allowed") {
+          setStatus("浏览器未允许麦克风，请在地址栏授权后重试。", "error");
+        } else if (err === "no-speech") {
+          setStatus("没有听到声音，再点一次麦克风试试。");
+        } else if (err !== "aborted") {
+          setStatus("语音识别失败：" + err, "error");
+        }
+      };
+
+      recognition.onresult = (event) => {
+        let interim = "";
+        let finalChunk = "";
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const piece = event.results[i][0].transcript;
+          if (event.results[i].isFinal) finalChunk += piece;
+          else interim += piece;
+        }
+        if (finalChunk) {
+          voiceBase = (voiceBase + finalChunk).trim();
+          els.need.value = voiceBase;
+        } else {
+          els.need.value = (voiceBase + (voiceBase && interim ? " " : "") + interim).trimStart();
+        }
+      };
+    }
+
+    function toggleVoice() {
+      if (!recognition || els.need.disabled) return;
+      if (listening) {
+        recognition.stop();
+        return;
+      }
+      voiceBase = els.need.value.trim();
+      if (voiceBase) voiceBase += " ";
+      try {
+        recognition.start();
+      } catch (err) {
+        setStatus("无法启动语音输入。", "error");
+      }
+    }
+
+    function setStatus(text, kind) {
+      els.status.textContent = text || "";
+      els.status.className = "status" + (kind ? " " + kind : "");
+    }
+
+    function renderDraft(draft) {
+      els.problem.textContent = (draft && draft.problem) || "—";
+      els.scope.textContent = (draft && draft.scope) || "—";
+      els.confirm.textContent = (draft && draft.confirm_step) || "—";
+      els.oos.innerHTML = "";
+      const items = (draft && draft.out_of_scope) || [];
+      if (!items.length) {
+        const li = document.createElement("li");
+        li.textContent = "—";
+        els.oos.appendChild(li);
+      } else {
+        for (const item of items) {
+          const li = document.createElement("li");
+          li.textContent = item;
+          els.oos.appendChild(li);
+        }
+      }
+    }
+
+    function renderTrace(trace) {
+      if (!Array.isArray(trace) || !trace.length) {
+        els.trace.textContent = "";
+        return;
+      }
+      els.trace.textContent =
+        "工具：" +
+        trace
+          .map((t) => {
+            if (t.pending) return t.tool + "(待确认)";
+            return t.ok ? t.tool : t.tool + "(失败)";
+          })
+          .join(" → ");
+    }
+
+    function showAwaiting(data) {
+      session = {
+        user_text: data.user_text,
+        draft: data.draft,
+        pending_lock: data.pending_lock,
+      };
+      renderDraft(data.draft);
+      renderTrace(data.trace);
+      els.results.classList.add("visible");
+      els.confirmRow.classList.add("visible");
+      els.lockedBanner.classList.remove("visible");
+      els.lockedBanner.textContent = "";
+      els.reset.hidden = true;
+      els.generate.disabled = false;
+      els.need.disabled = false;
+      if (els.voice) els.voice.disabled = false;
+      setStatus("草稿已就绪。确认锁定才会写入文件。", "ok");
+    }
+
+    function clearSessionKeepInput() {
+      session = null;
+      els.results.classList.remove("visible");
+      els.confirmRow.classList.remove("visible");
+      els.lockedBanner.classList.remove("visible");
+      els.lockedBanner.textContent = "";
+      els.reset.hidden = true;
+      renderDraft(null);
+      renderTrace([]);
+    }
+
+    async function onGenerate() {
+      if (recognition && listening) recognition.stop();
+      const text = els.need.value.trim();
+      if (!text) {
+        setStatus("请先贴一句模糊需求。", "error");
+        return;
+      }
+
+      els.generate.disabled = true;
+      els.need.disabled = true;
+      if (els.voice) els.voice.disabled = true;
+      els.confirmRow.classList.remove("visible");
+      els.lockedBanner.classList.remove("visible");
+      setStatus("生成中…");
+
+      try {
+        const res = await fetch("/api/brief", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "draft", text }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "生成失败");
+        }
+        if (data.status !== "awaiting_confirm") {
+          throw new Error(data.error || "未进入确认步骤");
+        }
+        showAwaiting(data);
+      } catch (err) {
+        session = null;
+        els.results.classList.remove("visible");
+        setStatus(err.message || "生成失败", "error");
+        els.generate.disabled = false;
+        els.need.disabled = false;
+        if (els.voice) els.voice.disabled = false;
+      }
+    }
+
+    async function onLock() {
+      if (!session) {
+        setStatus("没有待锁定的草稿。", "error");
+        return;
+      }
+      els.lock.disabled = true;
+      els.abandon.disabled = true;
+      els.generate.disabled = true;
+      setStatus("正在锁定…");
+
+      try {
+        const res = await fetch("/api/brief", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "confirm",
+            user_text: session.user_text,
+            draft: session.draft,
+            pending_lock: session.pending_lock,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "锁定失败");
+        }
+        els.confirmRow.classList.remove("visible");
+        els.lockedBanner.textContent = "已锁定 · " + data.filename;
+        els.lockedBanner.classList.add("visible");
+        els.reset.hidden = false;
+        els.need.disabled = true;
+        els.generate.disabled = true;
+        if (els.voice) els.voice.disabled = true;
+        setStatus("简报已写入 outputs/" + data.filename, "ok");
+        session = null;
+      } catch (err) {
+        setStatus(err.message || "锁定失败", "error");
+        els.lock.disabled = false;
+        els.abandon.disabled = false;
+        els.generate.disabled = false;
+      }
+    }
+
+    function onAbandon() {
+      if (recognition && listening) recognition.stop();
+      clearSessionKeepInput();
+      els.generate.disabled = false;
+      els.need.disabled = false;
+      if (els.voice) els.voice.disabled = false;
+      els.lock.disabled = false;
+      els.abandon.disabled = false;
+      setStatus("已放弃，未写入文件。可以改句子再生成。");
+    }
+
+    function onReset() {
+      if (recognition && listening) recognition.stop();
+      session = null;
+      els.need.value = "";
+      els.need.disabled = false;
+      els.generate.disabled = false;
+      if (els.voice) els.voice.disabled = false;
+      els.lock.disabled = false;
+      els.abandon.disabled = false;
+      clearSessionKeepInput();
+      setStatus("");
+      els.need.focus();
+    }
+
+    els.generate.addEventListener("click", onGenerate);
+    els.lock.addEventListener("click", onLock);
+    els.abandon.addEventListener("click", onAbandon);
+    els.reset.addEventListener("click", onReset);
+    if (els.voice) els.voice.addEventListener("click", toggleVoice);
+  </script>
+</body>
+</html>

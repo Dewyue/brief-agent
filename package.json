@@ -1,0 +1,13 @@
+{
+  "name": "brief-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "一页需求简报 Agent",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
